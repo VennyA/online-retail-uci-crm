@@ -1,307 +1,484 @@
-select * from online_retail;
+SELECT
+	*
+FROM
+	ONLINE_RETAIL;
 
+SELECT
+	*
+FROM
+	ONLINE_RETAIL
+WHERE
+	CUSTOMERID IS NOT NULL
+	AND INVOICENO NOT LIKE 'C%'
+	AND STOCKCODE ~ '[0-9]'
+	AND QUANTITY > 0
+	AND UNITPRICE > 0;
 
-select * from online_retail
-where customerid is not null
-and invoiceno not like 'C%'
-and StockCode ~ '[0-9]'
-and Quantity > 0
-and unitprice > 0;
+CREATE TABLE ONLINE_RETAILS AS
+SELECT
+	*
+FROM
+	ONLINE_RETAIL
+WHERE
+	CUSTOMERID IS NOT NULL
+	AND INVOICENO NOT LIKE 'C%'
+	AND STOCKCODE ~ '[0-9]'
+	AND QUANTITY > 0
+	AND UNITPRICE > 0;
 
+SELECT
+	*
+FROM
+	ONLINE_RETAILS;
 
-create table online_retails as
-select * from online_retail
-where customerid is not null
-and invoiceno not like 'C%'
-and StockCode ~ '[0-9]'
-and Quantity > 0
-and unitprice > 0;
+SELECT
+	SUM(QUANTITY * UNITPRICE) TOTAL_REVENUE
+FROM
+	ONLINE_RETAILS;
 
+SELECT
+	COUNT(DISTINCT CUSTOMERID) TOTAL_CUSTOMER
+FROM
+	ONLINE_RETAILS;
 
-select * from online_retails;
+ALTER TABLE ONLINE_RETAILS
+ALTER COLUMN INVOICEDATE TYPE TIMESTAMP USING TO_TIMESTAMP(INVOICEDATE, 'MM/DD/YYYY HH24:MI');
 
+WITH
+	RECENCY AS (
+		SELECT
+			CUSTOMERID,
+			'2011-12-10'::DATE - MAX(INVOICEDATE)::DATE AS RECENCY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	FREQUENCY AS (
+		SELECT
+			CUSTOMERID,
+			COUNT(DISTINCT INVOICENO) AS FREQUENCY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	MONETARY AS (
+		SELECT
+			CUSTOMERID,
+			SUM(QUANTITY * UNITPRICE) AS MONETARY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	RFM_SCORING AS (
+		SELECT
+			R.CUSTOMERID,
+			R.RECENCY,
+			F.FREQUENCY,
+			M.MONETARY,
+			NTILE(4) OVER (
+				ORDER BY
+					RECENCY DESC
+			) AS R_SCORE,
+			NTILE(4) OVER (
+				ORDER BY
+					FREQUENCY
+			) AS F_SCORE,
+			NTILE(4) OVER (
+				ORDER BY
+					MONETARY
+			) AS M_SCORE
+		FROM
+			RECENCY R
+			JOIN FREQUENCY F ON R.CUSTOMERID = F.CUSTOMERID
+			JOIN MONETARY M ON F.CUSTOMERID = M.CUSTOMERID
+	),
+	RFM_SEGMENTS AS (
+		SELECT
+			*,
+			CASE
+				WHEN R_SCORE = 4
+				AND F_SCORE = 4
+				AND M_SCORE = 4 THEN 'champions'
+				WHEN R_SCORE >= 3
+				AND F_SCORE >= 3 THEN 'loyal_Customers'
+				WHEN R_SCORE = 1
+				AND F_SCORE = 1 THEN 'Lost'
+				WHEN R_SCORE <= 2
+				AND F_SCORE <= 2 THEN 'hibernating'
+				WHEN R_SCORE >= 2
+				AND F_SCORE >= 2 THEN 'at_risk'
+				WHEN R_SCORE <= 2
+				AND F_SCORE >= 3 THEN 'cannot_lose_them'
+				WHEN R_SCORE >= 4
+				AND F_SCORE <= 2 THEN 'new_customers'
+				WHEN R_SCORE = 3
+				AND F_SCORE <= 2 THEN 'need_attention'
+				ELSE 'others'
+			END AS SEGMENTS
+		FROM
+			RFM_SCORING
+	),
+	CHURN_RISK AS (
+		SELECT
+			*,
+			CASE
+				WHEN RECENCY >= 180 THEN 'At_risk_of_churn'
+				ELSE 'Active'
+			END AS CHURN_RISKS
+		FROM
+			RFM_SEGMENTS
+	),
+	CHURN AS (
+		SELECT
+			*,
+			CASE
+				WHEN CHURN_RISKS = 'At_risk_of_churn' THEN 1
+				ELSE 0
+			END AS CHURN_FLAG
+		FROM
+			CHURN_RISK
+	)
+SELECT
+	*
+FROM
+	CHURN;
 
-select 
-Sum(quantity * Unitprice) Total_Revenue
-from online_retails;
+WITH
+	RECENCY AS (
+		SELECT
+			CUSTOMERID,
+			'2011-12-10'::DATE - MAX(INVOICEDATE)::DATE AS RECENCY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	FREQUENCY AS (
+		SELECT
+			CUSTOMERID,
+			COUNT(DISTINCT INVOICENO) AS FREQUENCY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	MONETARY AS (
+		SELECT
+			CUSTOMERID,
+			SUM(QUANTITY * UNITPRICE) AS MONETARY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	RFM_SCORING AS (
+		SELECT
+			R.CUSTOMERID,
+			R.RECENCY,
+			F.FREQUENCY,
+			M.MONETARY,
+			NTILE(4) OVER (
+				ORDER BY
+					RECENCY DESC
+			) AS R_SCORE,
+			NTILE(4) OVER (
+				ORDER BY
+					FREQUENCY
+			) AS F_SCORE,
+			NTILE(4) OVER (
+				ORDER BY
+					MONETARY
+			) AS M_SCORE
+		FROM
+			RECENCY R
+			JOIN FREQUENCY F ON R.CUSTOMERID = F.CUSTOMERID
+			JOIN MONETARY M ON F.CUSTOMERID = M.CUSTOMERID
+	),
+	RFM_SEGMENTS AS (
+		SELECT
+			*,
+			CASE
+				WHEN R_SCORE = 4
+				AND F_SCORE = 4
+				AND M_SCORE = 4 THEN 'champions'
+				WHEN R_SCORE >= 3
+				AND F_SCORE >= 3 THEN 'loyal_Customers'
+				WHEN R_SCORE = 1
+				AND F_SCORE = 1 THEN 'Lost'
+				WHEN R_SCORE <= 2
+				AND F_SCORE <= 2 THEN 'hibernating'
+				WHEN R_SCORE >= 2
+				AND F_SCORE >= 2 THEN 'at_risk'
+				WHEN R_SCORE <= 2
+				AND F_SCORE >= 3 THEN 'cannot_lose_them'
+				WHEN R_SCORE >= 4
+				AND F_SCORE <= 2 THEN 'new_customers'
+				WHEN R_SCORE = 3
+				AND F_SCORE <= 2 THEN 'need_attention'
+				ELSE 'others'
+			END AS SEGMENTS
+		FROM
+			RFM_SCORING
+	)
+SELECT
+	SEGMENTS,
+	COUNT(CUSTOMERID) CUSTOMER_COUNT
+FROM
+	RFM_SEGMENTS
+GROUP BY
+	SEGMENTS
+ORDER BY
+	CUSTOMER_COUNT DESC;
 
+WITH
+	RECENCY AS (
+		SELECT
+			CUSTOMERID,
+			'2011-12-10'::DATE - MAX(INVOICEDATE)::DATE AS RECENCY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	FREQUENCY AS (
+		SELECT
+			CUSTOMERID,
+			COUNT(DISTINCT INVOICENO) AS FREQUENCY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	MONETARY AS (
+		SELECT
+			CUSTOMERID,
+			SUM(QUANTITY * UNITPRICE) AS MONETARY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	RFM_SCORING AS (
+		SELECT
+			R.CUSTOMERID,
+			R.RECENCY,
+			F.FREQUENCY,
+			M.MONETARY,
+			NTILE(4) OVER (
+				ORDER BY
+					RECENCY DESC
+			) AS R_SCORE,
+			NTILE(4) OVER (
+				ORDER BY
+					FREQUENCY
+			) AS F_SCORE,
+			NTILE(4) OVER (
+				ORDER BY
+					MONETARY
+			) AS M_SCORE
+		FROM
+			RECENCY R
+			JOIN FREQUENCY F ON R.CUSTOMERID = F.CUSTOMERID
+			JOIN MONETARY M ON F.CUSTOMERID = M.CUSTOMERID
+	),
+	RFM_SEGMENTS AS (
+		SELECT
+			*,
+			CASE
+				WHEN R_SCORE = 4
+				AND F_SCORE = 4
+				AND M_SCORE = 4 THEN 'champions'
+				WHEN R_SCORE >= 3
+				AND F_SCORE >= 3 THEN 'loyal_Customers'
+				WHEN R_SCORE = 1
+				AND F_SCORE = 1 THEN 'Lost'
+				WHEN R_SCORE <= 2
+				AND F_SCORE <= 2 THEN 'hibernating'
+				WHEN R_SCORE >= 2
+				AND F_SCORE >= 2 THEN 'at_risk'
+				WHEN R_SCORE <= 2
+				AND F_SCORE >= 3 THEN 'cannot_lose_them'
+				WHEN R_SCORE >= 4
+				AND F_SCORE <= 2 THEN 'new_customers'
+				WHEN R_SCORE = 3
+				AND F_SCORE <= 2 THEN 'need_attention'
+				ELSE 'others'
+			END AS SEGMENTS
+		FROM
+			RFM_SCORING
+	),
+	CHURN_RISK AS (
+		SELECT
+			*,
+			CASE
+				WHEN RECENCY >= 180 THEN 'At_risk_of_churn'
+				ELSE 'Active'
+			END AS CHURN_RISKS
+		FROM
+			RFM_SEGMENTS
+	),
+	CHURN AS (
+		SELECT
+			*,
+			CASE
+				WHEN CHURN_RISKS = 'At_risk_of_churn' THEN 1
+				ELSE 0
+			END AS CHURN_FLAG
+		FROM
+			CHURN_RISK
+	)
+SELECT
+	ROUND(AVG(CHURN_FLAG) * 100, 2)
+FROM
+	CHURN;
 
-select count (distinct customerid) Total_Customer
-from online_retails;
+WITH
+	INVOICE_MONTH AS (
+		SELECT
+			CUSTOMERID,
+			DATE_TRUNC('month', INVOICEDATE)::DATE AS INVOICE_MONTH
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID,
+			INVOICE_MONTH
+	),
+	FIRST_PURCHASE AS (
+		SELECT
+			CUSTOMERID,
+			MIN(DATE_TRUNC('month', INVOICEDATE))::DATE AS FIRST_PURCHASE_MONTH
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	COHORT_INDEX AS (
+		SELECT
+			I.CUSTOMERID,
+			INVOICE_MONTH,
+			FIRST_PURCHASE_MONTH,
+			(
+				DATE_PART('year', AGE (INVOICE_MONTH, FIRST_PURCHASE_MONTH)) * 12 + DATE_PART(
+					'month',
+					AGE (INVOICE_MONTH, FIRST_PURCHASE_MONTH)
+				)
+			) AS COHORT_INDEX
+		FROM
+			INVOICE_MONTH I
+			JOIN FIRST_PURCHASE F ON I.CUSTOMERID = F.CUSTOMERID
+	),
+	COHORT_COUNTS AS (
+		SELECT
+			FIRST_PURCHASE_MONTH,
+			COHORT_INDEX,
+			COUNT(DISTINCT CUSTOMERID) AS DISTINCT_CUSTOMERS
+		FROM
+			COHORT_INDEX
+		GROUP BY
+			FIRST_PURCHASE_MONTH,
+			COHORT_INDEX
+	),
+	COHORT_SIZE AS (
+		SELECT
+			FIRST_PURCHASE_MONTH,
+			COUNT(DISTINCT CUSTOMERID) COHORT_CUSTOMERS
+		FROM
+			COHORT_INDEX
+		WHERE
+			COHORT_INDEX = 0
+		GROUP BY
+			FIRST_PURCHASE_MONTH,
+			COHORT_INDEX
+	)
+SELECT
+	A.FIRST_PURCHASE_MONTH,
+	COHORT_INDEX,
+	COHORT_CUSTOMERS,
+	ROUND(
+		(DISTINCT_CUSTOMERS::DECIMAL / COHORT_CUSTOMERS) * 100,
+		2
+	) AS RETENTION_RATE
+FROM
+	COHORT_COUNTS A
+	JOIN COHORT_SIZE B ON A.FIRST_PURCHASE_MONTH = B.FIRST_PURCHASE_MONTH;
 
-
-ALTER TABLE online_retails 
-ALTER COLUMN invoicedate TYPE TIMESTAMP 
-USING TO_TIMESTAMP(invoicedate, 'MM/DD/YYYY HH24:MI');
-
-
-with Recency as(
-select customerid,
-'2011-12-10' :: date - max(invoicedate) :: date as Recency
-from online_retails 
-group by customerid
-),
-Frequency as(
-select customerid, count (distinct invoiceno) as Frequency
-from online_retails 
-group by customerid
-),
-Monetary as(
-select customerid, 
-sum(quantity * unitprice) as Monetary
-from online_retails 
-group by customerid
-),
-rfm_scoring as(
-select r.customerid, r.recency,f.frequency,m.monetary,
-ntile(4) over (order by recency DESC) as r_score,
-ntile(4) over (order by frequency ) as f_score,
-ntile(4) over (order by monetary ) as m_score
-from recency r join frequency f
-on r.customerid = f.customerid
-join monetary m on 
-f.customerid = m.customerid),
-rfm_segments AS (
-select *,
-case 
-when r_score = 4 and f_score = 4 and m_score =4 then 'champions'
-when r_score >=3 and f_score >=3 then 'loyal_Customers'
-when r_score =1 and f_score =1 then 'Lost'
-when r_score <= 2 and f_score <=2 then 'hibernating'
-when r_score >=2 and f_score >=2 then 'at_risk'
-when r_score <=2 and f_score >=3 then 'cannot_lose_them'
-when r_score>=4 and f_score <=2 then 'new_customers'
-when r_score = 3 and f_score <= 2 then 'need_attention'
-else 'others'
-end as segments
-from rfm_scoring
-),
-Churn_Risk as (
-select *,
-case when recency >= 180 then 'At_risk_of_churn'
-else 'Active' end as Churn_risks
-from rfm_segments
-),
-Churn as (
-select *,
-case when  churn_risks = 'At_risk_of_churn' then 1 else 0 end as Churn_Flag
-from Churn_Risk
-)
-select * from churn;
-
-
-
-with Recency as(
-select customerid,
-'2011-12-10' :: date - max(invoicedate) :: date as Recency
-from online_retails 
-group by customerid
-),
-Frequency as(
-select customerid, count (distinct invoiceno) as Frequency
-from online_retails 
-group by customerid
-),
-Monetary as(
-select customerid, 
-sum(quantity * unitprice) as Monetary
-from online_retails 
-group by customerid
-),
-rfm_scoring as(
-select r.customerid, r.recency,f.frequency,m.monetary,
-ntile(4) over (order by recency DESC) as r_score,
-ntile(4) over (order by frequency ) as f_score,
-ntile(4) over (order by monetary ) as m_score
-from recency r join frequency f
-on r.customerid = f.customerid
-join monetary m on 
-f.customerid = m.customerid),
-rfm_segments AS (
-select *,
-case 
-when r_score = 4 and f_score = 4 and m_score =4 then 'champions'
-when r_score >=3 and f_score >=3 then 'loyal_Customers'
-when r_score =1 and f_score =1 then 'Lost'
-when r_score <= 2 and f_score <=2 then 'hibernating'
-when r_score >=2 and f_score >=2 then 'at_risk'
-when r_score <=2 and f_score >=3 then 'cannot_lose_them'
-when r_score>=4 and f_score <=2 then 'new_customers'
-when r_score = 3 and f_score <= 2 then 'need_attention'
-else 'others'
-end as segments
-from rfm_scoring
-)
-select segments,
-count (customerid) Customer_count
-from rfm_segments
-group by segments
-order by customer_count desc;
-
-
-
-
-
-
-with Recency as(
-select customerid,
-'2011-12-10' :: date - max(invoicedate) :: date as Recency
-from online_retails 
-group by customerid
-),
-Frequency as(
-select customerid, count (distinct invoiceno) as Frequency
-from online_retails 
-group by customerid
-),
-Monetary as(
-select customerid, 
-sum(quantity * unitprice) as Monetary
-from online_retails 
-group by customerid
-),
-rfm_scoring as(
-select r.customerid, r.recency,f.frequency,m.monetary,
-ntile(4) over (order by recency DESC) as r_score,
-ntile(4) over (order by frequency ) as f_score,
-ntile(4) over (order by monetary ) as m_score
-from recency r join frequency f
-on r.customerid = f.customerid
-join monetary m on 
-f.customerid = m.customerid),
-rfm_segments AS (
-select *,
-case 
-when r_score = 4 and f_score = 4 and m_score =4 then 'champions'
-when r_score >=3 and f_score >=3 then 'loyal_Customers'
-when r_score =1 and f_score =1 then 'Lost'
-when r_score <= 2 and f_score <=2 then 'hibernating'
-when r_score >=2 and f_score >=2 then 'at_risk'
-when r_score <=2 and f_score >=3 then 'cannot_lose_them'
-when r_score>=4 and f_score <=2 then 'new_customers'
-when r_score = 3 and f_score <= 2 then 'need_attention'
-else 'others'
-end as segments
-from rfm_scoring
-),
-Churn_Risk as (
-select *,
-case when recency >= 180 then 'At_risk_of_churn'
-else 'Active' end as Churn_risks
-from rfm_segments
-),
-Churn as (
-select *,
-case when  churn_risks = 'At_risk_of_churn' then 1 else 0 end as Churn_Flag
-from Churn_Risk
-)
-select round(avg(churn_flag)* 100,2)from churn;
-
-
-
-with invoice_month as(
-select
-customerid, 
-date_trunc('month', invoicedate) :: date as invoice_month
-from online_retails
-group by customerid, invoice_month
-),
-first_purchase as(
-select
-customerid, 
-min(date_trunc('month', invoicedate)) :: date as first_purchase_month
-from online_retails
-group by customerid
-),
-Cohort_index as 
-(
-select 
-i.customerid,
-invoice_month, 
-first_purchase_month,
-(DATE_PART('year', AGE(invoice_month, first_purchase_month)) * 12 + 
-DATE_PART('month', AGE(invoice_month, first_purchase_month)))
-AS cohort_index from invoice_month i join first_purchase f
-on i.customerid = f.customerid
-),
-cohort_counts AS (
-    SELECT
-	first_purchase_month,
-    cohort_index,
-    COUNT(DISTINCT customerid) AS distinct_customers
-    FROM cohort_index
-    GROUP BY first_purchase_month, cohort_index
-),
-Cohort_Size as 
-(SELECT 
-first_purchase_month,
-COUNT(DISTINCT customerid) Cohort_customers
-FROM cohort_index
-where cohort_index = 0
-GROUP BY first_purchase_month, cohort_index
-)
-select 
-a. first_purchase_month, 
-cohort_index, 
-cohort_customers, 
-round((Distinct_customers :: decimal /cohort_customers) * 100,2) as retention_rate
-from cohort_counts a join cohort_size b
-on a.first_purchase_month=b.first_purchase_month;
-
-
-
-with Frequency as(
-select customerid, count (distinct invoiceno) as Frequency
-from online_retails 
-group by customerid
-),
-Monetary as(
-select customerid, 
-sum(quantity * unitprice) as Monetary
-from online_retails 
-group by customerid
-),
-AOV as(
-select f.customerid,
-f.frequency,
-m.monetary,
-round((m.monetary/f.frequency),2) as AOV
-from frequency f
-join monetary m on 
-f.customerid=m.customerid
-),
-first_purchase as(
-select
-customerid, 
-min(date_trunc('month', invoicedate)) :: date as first_purchase_month
-from online_retails
-group by customerid
-),
-Last_purchase as(
-select
-customerid, 
-max(date_trunc('month', invoicedate)) :: date as last_purchase_month
-from online_retails
-group by customerid
-),
-customer_lifespan as (select a.customerid, 
-frequency,
-monetary,
-a.AOV,
-DATE_PART('year', AGE(last_purchase_month, first_purchase_month)) * 12 + 
-DATE_PART('month', AGE(last_purchase_month, first_purchase_month)) AS CUSTOMER_LIFESPAN
-FROM aov a join first_purchase fp
-on a.customerid = fp.customerid
-JOIN last_purchase lp on
-lp.customerid = a. customerid
-)
-select customerid, 
-frequency,
-monetary,
-aov,
-customer_lifespan,
-ROUND((aov * frequency * GREATEST(customer_lifespan, 1))::numeric, 2) as clv
-from customer_lifespan
-
-
-
+WITH
+	FREQUENCY AS (
+		SELECT
+			CUSTOMERID,
+			COUNT(DISTINCT INVOICENO) AS FREQUENCY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	MONETARY AS (
+		SELECT
+			CUSTOMERID,
+			SUM(QUANTITY * UNITPRICE) AS MONETARY
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	AOV AS (
+		SELECT
+			F.CUSTOMERID,
+			F.FREQUENCY,
+			M.MONETARY,
+			ROUND((M.MONETARY / F.FREQUENCY), 2) AS AOV
+		FROM
+			FREQUENCY F
+			JOIN MONETARY M ON F.CUSTOMERID = M.CUSTOMERID
+	),
+	FIRST_PURCHASE AS (
+		SELECT
+			CUSTOMERID,
+			MIN(DATE_TRUNC('month', INVOICEDATE))::DATE AS FIRST_PURCHASE_MONTH
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	LAST_PURCHASE AS (
+		SELECT
+			CUSTOMERID,
+			MAX(DATE_TRUNC('month', INVOICEDATE))::DATE AS LAST_PURCHASE_MONTH
+		FROM
+			ONLINE_RETAILS
+		GROUP BY
+			CUSTOMERID
+	),
+	CUSTOMER_LIFESPAN AS (
+		SELECT
+			A.CUSTOMERID,
+			FREQUENCY,
+			MONETARY,
+			A.AOV,
+			DATE_PART(
+				'year',
+				AGE (LAST_PURCHASE_MONTH, FIRST_PURCHASE_MONTH)
+			) * 12 + DATE_PART(
+				'month',
+				AGE (LAST_PURCHASE_MONTH, FIRST_PURCHASE_MONTH)
+			) AS CUSTOMER_LIFESPAN
+		FROM
+			AOV A
+			JOIN FIRST_PURCHASE FP ON A.CUSTOMERID = FP.CUSTOMERID
+			JOIN LAST_PURCHASE LP ON LP.CUSTOMERID = A.CUSTOMERID
+	)
+SELECT
+	CUSTOMERID,
+	FREQUENCY,
+	MONETARY,
+	AOV,
+	CUSTOMER_LIFESPAN,
+	ROUND(
+		(AOV * FREQUENCY * GREATEST(CUSTOMER_LIFESPAN, 1))::NUMERIC,
+		2
+	) AS CLV
+FROM
+	CUSTOMER_LIFESPAN
