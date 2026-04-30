@@ -8,6 +8,8 @@ Using RFM segmentation, 4,334 business accounts were analyzed based on purchasin
 **Domain:** CRM Analytics / Customer Intelligence  
 **Business Context:** This project reframes a B2C retail dataset as a B2B wholesale portfolio. Each CustomerID is treated as a business account, and each transaction as a purchase order.
 The focus is on understanding account health which accounts are valuable, which are declining, and how behaviour changes over time. In a wholesale setting, losing a high-value account has a very strong impact, so visibility here is critical.
+
+
 **Why This Project Matters:**  
 Without visibility into account behavior, an analyst cannot identify which accounts are at risk, which are growing, or where revenue is concentrated. This analysis provides that visibility through RFM segmentation, churn flagging, cohort retention tracking, and CLV ranking.
 
@@ -54,7 +56,7 @@ This analysis was designed to answer the following business questions:
 - **PostgreSQL** — Used for data cleaning, RFM scoring, cohort analysis, CLV calculation
 - **Power BI** — data modelling, DAX measures, interactive dashboard
 - **GitHub** — Documentation
----
+ 
 
 **Methodology:**
 
@@ -146,28 +148,32 @@ Flag inactivity early (e.g. 30 days without orders)
 Offer incentives or priority support
 
 
----
+ 
 
 ### Recommendation 2 — Run targeted win-back campaigns
 Identify churned and at-risk accounts
 Prioritise by value (CLV)
 Use personalised outreach tied to past purchases
 
----
+ 
 
 ### Recommendation 3 — Improve early engagement
 Follow up after first purchase
 Encourage a second order quickly
 Track and nurture new accounts into repeat buyers
 
----
+
 ## Visuals Preview
 -**Dashboard Screenshots**-
-<img width="679" height="378" alt="image" src="https://github.com/user-attachments/assets/737c1506-e5ef-410e-84cb-15b6e5d8f1ba" /> <img width="679" height="382" alt="image" src="https://github.com/user-attachments/assets/6c2477fb-795b-4a57-aa5e-0b02ec02211d" />
+<img width="679" height="378" alt="image" src="https://github.com/user-attachments/assets/737c1506-e5ef-410e-84cb-15b6e5d8f1ba" />
 
--**Before and After Claening**-
+<img width="679" height="382" alt="image" src="https://github.com/user-attachments/assets/6c2477fb-795b-4a57-aa5e-0b02ec02211d" />
+
+-**Before and After Cleaning**-
 <img width="603" height="346" alt="image" src="https://github.com/user-attachments/assets/ea675e45-9524-4519-a105-785f48b22b29" /> 
+
 <img width="778" height="364" alt="image" src="https://github.com/user-attachments/assets/fd4a4120-e399-4597-a9a5-c8f1d5dc71ca" /> 
+
 <img width="769" height="397" alt="image" src="https://github.com/user-attachments/assets/72ebda83-18fe-422d-8f26-32f3b6558ccd" />
 
 
@@ -179,7 +185,6 @@ Track and nurture new accounts into repeat buyers
 -**Data Model Diagram**-
 <img width="729" height="310" alt="image" src="https://github.com/user-attachments/assets/6ecb76d4-0ae6-42a8-8c59-56340de42455" />
 
--**Process Flow Diagram**-
 
 
 ## Limitations
@@ -198,4 +203,16 @@ The original data is consumer retail. Treating CustomerIDs as business accounts 
 - **Churn threshold is assumed** — The 180-day threshold is a standard benchmark. In practice, churn would depend on the company’s actual sales cycle.
 
 - **Missing CustomerIDs** — A significant portion of transactions were excluded due to missing IDs, which may slightly skew customer counts and revenue distribution.
+
+
+
+## Conclusion
+
+This project evaluates account health, purchasing behaviour, and revenue concentration across 4,334 customers using transactional data.
+
+Applying RFM segmentation, churn analysis, cohort tracking, and CLV highlights three core patterns:
+
+Revenue is highly concentrated in a small group of customers → retention here is critical
+Around 1 in 5 customers are already inactive → clear recovery opportunity
+Most customers don’t return after their first month → weak early engagement
 
