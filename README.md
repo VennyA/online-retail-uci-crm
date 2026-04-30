@@ -184,7 +184,8 @@ Track and nurture new accounts into repeat buyers
 
 -**SQL Query**-
 
-<img width="777" height="389" alt="image" src="https://github.com/user-attachments/assets/245c522a-3436-4fa2-b490-aa4275165981" />
+<img width="776" height="404" alt="image" src="https://github.com/user-attachments/assets/7722ae5c-197d-4707-912b-472566b6a867" />
+
 
 -**Data Model Diagram**-
 <img width="729" height="310" alt="image" src="https://github.com/user-attachments/assets/6ecb76d4-0ae6-42a8-8c59-56340de42455" />
