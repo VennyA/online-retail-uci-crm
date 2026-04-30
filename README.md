@@ -90,3 +90,4 @@ A 2-page interactive Power BI dashboard was built covering:
 - RFM segmentation and revenue by segment
 - Cohort retention heatmap and account churn status
 
+<img width="603" height="348" alt="image" src="https://github.com/user-attachments/assets/8829bfdf-405f-4e1f-944a-98a749248867" />
