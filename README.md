@@ -166,11 +166,8 @@ Track and nurture new accounts into repeat buyers
 <img width="679" height="378" alt="image" src="https://github.com/user-attachments/assets/737c1506-e5ef-410e-84cb-15b6e5d8f1ba" /> <img width="679" height="382" alt="image" src="https://github.com/user-attachments/assets/6c2477fb-795b-4a57-aa5e-0b02ec02211d" />
 
 -**Before and After Claening**-
-### Dashboard — RFM Segment Page
 <img width="603" height="346" alt="image" src="https://github.com/user-attachments/assets/ea675e45-9524-4519-a105-785f48b22b29" /> 
-### Dashboard — Cohort Analysis Page
 <img width="778" height="364" alt="image" src="https://github.com/user-attachments/assets/fd4a4120-e399-4597-a9a5-c8f1d5dc71ca" /> 
-### Before Cleaning
 <img width="769" height="397" alt="image" src="https://github.com/user-attachments/assets/72ebda83-18fe-422d-8f26-32f3b6558ccd" />
 
 
