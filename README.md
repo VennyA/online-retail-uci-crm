@@ -95,9 +95,10 @@ Customer Lifetime Value was calculated as:
 CLV = Average Order Value × Frequency × Customer Lifespan (months). A minimum lifespan of 1 month was applied to avoid zero CLV for single-purchase accounts.
 
 ### 7. Data Visualisation
-A 2-page interactive Power BI dashboard was built covering:
-- RFM segmentation and revenue by segment
-- Cohort retention heatmap and account churn status
+A 3-page interactive Power BI dashboard was built covering:
+- RFM segmentatioN
+- revenue by segment
+- Cohort retention heatmap 
 
 
 
