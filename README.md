@@ -165,9 +165,12 @@ Track and nurture new accounts into repeat buyers
 
 ## Visuals Preview
 -**Dashboard Screenshots**-
-<img width="679" height="378" alt="image" src="https://github.com/user-attachments/assets/737c1506-e5ef-410e-84cb-15b6e5d8f1ba" />
+<img width="682" height="379" alt="image" src="https://github.com/user-attachments/assets/e002d854-cf9f-4fe4-ab62-f033869e845e" />
 
-<img width="679" height="382" alt="image" src="https://github.com/user-attachments/assets/6c2477fb-795b-4a57-aa5e-0b02ec02211d" />
+<img width="677" height="373" alt="image" src="https://github.com/user-attachments/assets/792ef57f-bedb-4f7f-84c7-52b31ead3c53" />
+
+<img width="674" height="373" alt="image" src="https://github.com/user-attachments/assets/aa0ca63e-39c6-4b09-a201-5334b5707c2c" />
+
 
 -**Before and After Cleaning**-
 <img width="603" height="346" alt="image" src="https://github.com/user-attachments/assets/ea675e45-9524-4519-a105-785f48b22b29" /> 
